@@ -28,7 +28,7 @@ var globalArgs = {
  *
  * input is the input markup
  *
- * types is an array of markup types to convert to
+ * types is an array of markup types to convert to or a single type as a string
  *
  * callback will be passed an object mapping markup type to markup, unless
  * there was an error in which case it gets passed (null, statusCode)
@@ -42,8 +42,8 @@ exports.convert = function(type, input, types, callback) {
     throw 'Invalid markup type: must be a string.';
   }
 
-  if(!Array.isArray(types)) {
-    throw 'Invalid destination types: must be an array of strings.';
+  if(typeof types !== 'string' && !Array.isArray(types)) {
+    throw 'Invalid destination types: must be a string or an array of strings.';
   }
 
   if(types.length <= 0) {
@@ -64,6 +64,10 @@ exports.convert = function(type, input, types, callback) {
 
   var targetResponses = types.length - 1;
   var numResponses = 0;
+
+  if(typeof types === 'string') {
+    types = [ types ];
+  }
 
   for(var i in types) {
     if(typeof types[i] !== 'string') {
