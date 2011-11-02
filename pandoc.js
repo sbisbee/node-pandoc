@@ -1,5 +1,14 @@
 var spawn = require('child_process').spawn;
 
+var globalArgs = {
+  provided: null,
+  persist: false,
+  reset: function() {
+    this.provided = null;
+    this.persist = false;
+  }
+};
+
 /*
  * type is the input markup's type
  *
@@ -25,7 +34,10 @@ exports.convert = function(type, input, types, callback) {
      * it on the res object.
      */
     if(!res[types[i]]) {
-      var pandoc = spawn('pandoc', [ '-f', type, '-t', types[i] ]);
+      var args = globalArgs.provided || [];
+      args.push('-f', type, '-t', types[i]);
+
+      var pandoc = spawn('pandoc', args);
 
       //so that we have the target type in scope on('data') - love ya some asynch
       pandoc.stdout.targetType = types[i];
@@ -53,6 +65,33 @@ exports.convert = function(type, input, types, callback) {
       //pipe them the input
       pandoc.stdin.write(input, 'utf8');
       pandoc.stdin.end();
+
+      if(!globalArgs.persist) {
+        globalArgs.reset();
+      }
     }
   }
+};
+
+/*
+ * args is an array of command line arguments that should be passed to pandoc
+ * on the next call. If set to a non-array value, then default args will be
+ * used. The default behavior is that they will be thrown away before the next
+ * call.
+ *
+ * persist is a boolean that when set to true will persist the provided args
+ * for future calls.
+ *
+ * Returns this module so you can chain this funciton with convert().
+ */
+exports.args = function(args, persist) {
+  if(Array.isArray(args)) {
+    globalArgs.provided = args;
+    globalArgs.persist = persist;
+  }
+  else {
+    globalArgs.reset();
+  }
+
+  return exports;
 };
