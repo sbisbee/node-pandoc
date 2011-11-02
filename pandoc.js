@@ -54,11 +54,13 @@ exports.convert = function(type, input, types, callback) {
 
         numResponses++;
 
-        if(code !== 0) {
-          callback(null, code);
-        }
-        else if(numResponses === targetResponses) {
-          callback(res);
+        if(typeof callback === 'function') {
+          if(code !== 0) {
+            callback(null, code);
+          }
+          else if(numResponses === targetResponses) {
+            callback(res);
+          }
         }
       });
 
