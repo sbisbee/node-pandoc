@@ -1,0 +1,17 @@
+{
+  "author": "Sam Bisbee <sam@sbisbee.com> (http://www.sbisbee.com)",
+  "name": "pandoc",
+  "description": "A wrapper around the pandoc tool.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/sbisbee/node-pandoc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sbisbee/node-pandoc.git"
+  },
+  "main": "pandoc",
+  "engines": {
+    "node": "0.4.x | 0.5.x"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
