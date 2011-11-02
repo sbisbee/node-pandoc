@@ -8,9 +8,15 @@
 
 var spawn = require('child_process').spawn;
 
+// The global command line args for pandocs.
 var globalArgs = {
+  //what the user provided
   provided: null,
+
+  //whether to persist between convert() calls
   persist: false,
+
+  //resets back to defaults
   reset: function() {
     this.provided = null;
     this.persist = false;
@@ -28,6 +34,31 @@ var globalArgs = {
  * there was an error in which case it gets passed (null, statusCode)
  */
 exports.convert = function(type, input, types, callback) {
+  if(!type || typeof type !== 'string') {
+    throw 'Invalid source markup type: must be a string.';
+  }
+
+  if(!input || typeof input !== 'string') {
+    throw 'Invalid markup type: must be a string.';
+  }
+
+  if(!Array.isArray(types)) {
+    throw 'Invalid destination types: must be an array of strings.';
+  }
+
+  if(types.length <= 0) {
+    throw 'No destination types provided (empty array).';
+  }
+
+  if(typeof callback !== 'function') {
+    if(callback) {
+      throw 'Invalid callback provided: must be a function.';
+    }
+
+    console.log('Warning: no callback function passed to pandoc.convert().');
+  }
+
+  //what we're going to send to the callback if there are no pandoc errors
   var res = {};
   res[type] = input;
 
@@ -35,6 +66,10 @@ exports.convert = function(type, input, types, callback) {
   var numResponses = 0;
 
   for(var i in types) {
+    if(typeof types[i] !== 'string') {
+      throw 'Invalid destination type provided: non-string value found in array.';
+    }
+
     /*
      * This if-block filters out the target markup type because we already set
      * it on the res object.
