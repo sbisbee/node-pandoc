@@ -83,8 +83,6 @@ exports.convert = function(type, input, types, callback) {
       //so that we have the target type in scope on('data') - love ya some asynch
       pandoc.stdout.targetType = types[i];
 
-      pandoc.stdout.proc = pandoc;
-
       pandoc.stdout.on('data', function(data) {
         //data will be a binary stream if you don't cast it to a string
         res[this.targetType] = data + '';
