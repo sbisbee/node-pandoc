@@ -1,3 +1,11 @@
+/*
+ * node-pandoc
+ *
+ * This is the main, and currently only, file. It wraps the `pandoc` command
+ * using node's child_process module. Since we still have to support node 0.4.x
+ * (latest stable) we have to use spawn instead of fork().
+ */
+
 var spawn = require('child_process').spawn;
 
 /*
@@ -11,8 +19,6 @@ var spawn = require('child_process').spawn;
  * there was an error in which case it gets passed (null, statusCode)
  */
 exports.convert = function(type, input, types, callback) {
-  console.log(type, input, types, callback);
-
   var res = {};
   res[type] = input;
 
