@@ -12,6 +12,44 @@ Compatability
 
 node-pandoc is tested against Node v0.4.x.
 
+Examples
+--------
+
+At a very basic level this library allows you to convert one markup type into
+one or many. Supported markup types depends on how you installed Pandoc.
+
+  * Convert markdown into HTML
+
+var pandoc = require('pandoc');
+
+pandoc.convert('markdown', mdText, [ 'html' ], function(result, err) {
+  console.log(result.html); //outputs html
+  console.log(result.markdown); //outputs the original markdown
+});
+
+  * Convert HTML into reStructredTest and plain text
+
+var pandoc = require('pandoc');
+
+pandoc.convert('html', htmlText, [ 'rst', 'plain' ], function(result, err) {
+  console.log(result.rst); //outputs the reStructured Text
+  console.log(result.plain); //outputs the plain text
+  console.log(result.html); //outputs the HTML text
+});
+
+  * Deal with errors (err is the exit status code from pandoc)
+
+var pandoc = require('pandoc');
+
+pandoc.convert('invalid', moreInvalid, [], function(result, err) {
+  if(err) {
+    console.log('pandoc exited with status code ' + err);
+  }
+  else {
+    //do stuff
+  }
+});
+
 License
 -------
 
