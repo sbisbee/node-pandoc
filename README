@@ -1,0 +1,21 @@
+node-pandoc
+===========
+
+Version 0.1.0-UNRELEASED
+https://github.com/sbisbee/node-pandoc
+
+A node module that wraps the Pandoc tool (http://johnmacfarlane.net/pandoc/),
+allowing you to covert between markup types in node.
+
+Compatability
+-------------
+
+node-pandoc is tested against Node v0.4.x.
+
+License
+-------
+
+node-pandoc is released under the Apache License, version 2.0. See the file
+named LICENSE for more information.
+
+Copyright information is in the NOTICE file.
