@@ -1,0 +1,20 @@
+node-pandoc Changes
+===================
+
+Version 0.2.0
+-------------
+
+Breaking Changes
+
+  * A callback is now required when calling convert(), which was previously not
+    the case. It makes no sense to run the function without a callback though.
+
+Fixed Bugs
+
+  * Fixed an off by one error that oddly seems to only be showing up in Node
+    0.6.x, but not 0.4.x.
+
+Version 0.1.0
+-------------
+
+Initial Release
