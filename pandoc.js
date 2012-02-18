@@ -34,6 +34,15 @@ var globalArgs = {
  * there was an error in which case it gets passed (null, statusCode)
  */
 exports.convert = function(type, input, types, callback) {
+  var res = {};
+  var numResponses = 0;
+  var targetResponses;
+
+  var pandoc;
+  var args;
+
+  var i;
+
   if(!type || typeof type !== 'string') {
     throw 'Invalid source markup type: must be a string.';
   }
@@ -60,17 +69,15 @@ exports.convert = function(type, input, types, callback) {
   }
 
   //what we're going to send to the callback if there are no pandoc errors
-  var res = {};
   res[type] = input;
 
-  var targetResponses = types.length;
-  var numResponses = 0;
+  targetResponses = types.length;
 
   if(typeof types === 'string') {
     types = [ types ];
   }
 
-  for(var i in types) {
+  for(i in types) {
     if(typeof types[i] !== 'string') {
       throw 'Invalid destination type provided: non-string value found in array.';
     }
@@ -80,10 +87,10 @@ exports.convert = function(type, input, types, callback) {
      * it on the res object.
      */
     if(!res[types[i]]) {
-      var args = globalArgs.provided || [];
+      args = globalArgs.provided || [];
       args.push('-f', type, '-t', types[i]);
 
-      var pandoc = spawn('pandoc', args);
+      pandoc = spawn('pandoc', args);
 
       //so that we have the target type in scope on('data') - love ya some asynch
       pandoc.stdout.targetType = types[i];
