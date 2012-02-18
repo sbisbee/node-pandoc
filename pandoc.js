@@ -62,7 +62,7 @@ exports.convert = function(type, input, types, callback) {
   var res = {};
   res[type] = input;
 
-  var targetResponses = types.length - 1;
+  var targetResponses = types.length;
   var numResponses = 0;
 
   if(typeof types === 'string') {
