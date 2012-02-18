@@ -1,7 +1,7 @@
 node-pandoc
 ===========
 
-Version 0.1.0-UNRELEASED
+Version 0.2.0
 https://github.com/sbisbee/node-pandoc
 
 A node module that wraps the Pandoc tool (http://johnmacfarlane.net/pandoc/),
@@ -10,7 +10,7 @@ allowing you to covert between markup types in node.
 Compatability
 -------------
 
-node-pandoc is tested against Node v0.4.x.
+node-pandoc is tested against Node v0.6.x and v0.7.x.
 
 Examples
 --------
