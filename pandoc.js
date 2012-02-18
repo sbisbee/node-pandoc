@@ -78,45 +78,47 @@ exports.convert = function(type, input, types, callback) {
   }
 
   for(i in types) {
-    if(typeof types[i] !== 'string') {
-      throw 'Invalid destination type provided: non-string value found in array.';
-    }
+    if(types.hasOwnProperty(i)) {
+      if(typeof types[i] !== 'string') {
+        throw 'Invalid destination type provided: non-string value found in array.';
+      }
 
-    /*
-     * This if-block filters out the target markup type because we already set
-     * it on the res object.
-     */
-    if(!res[types[i]]) {
-      args = globalArgs.provided || [];
-      args.push('-f', type, '-t', types[i]);
+      /*
+       * This if-block filters out the target markup type because we already set
+       * it on the res object.
+       */
+      if(!res[types[i]]) {
+        args = globalArgs.provided || [];
+        args.push('-f', type, '-t', types[i]);
 
-      pandoc = spawn('pandoc', args);
+        pandoc = spawn('pandoc', args);
 
-      //so that we have the target type in scope on('data') - love ya some asynch
-      pandoc.stdout.targetType = types[i];
+        //so that we have the target type in scope on('data') - love ya some asynch
+        pandoc.stdout.targetType = types[i];
 
-      pandoc.stdout.on('data', function(data) {
-        //data will be a binary stream if you don't cast it to a string
-        res[this.targetType] = data + '';
-      });
+        pandoc.stdout.on('data', function(data) {
+          //data will be a binary stream if you don't cast it to a string
+          res[this.targetType] = data + '';
+        });
 
-      pandoc.on('exit', function(code, signal) {
-        numResponses++;
+        pandoc.on('exit', function(code, signal) {
+          numResponses++;
 
-        if(code !== 0) {
-          callback(null, code);
+          if(code !== 0) {
+            callback(null, code);
+          }
+          else if(numResponses === targetResponses) {
+            callback(res);
+          }
+        });
+
+        //pipe them the input
+        pandoc.stdin.write(input, 'utf8');
+        pandoc.stdin.end();
+
+        if(!globalArgs.persist) {
+          globalArgs.reset();
         }
-        else if(numResponses === targetResponses) {
-          callback(res);
-        }
-      });
-
-      //pipe them the input
-      pandoc.stdin.write(input, 'utf8');
-      pandoc.stdin.end();
-
-      if(!globalArgs.persist) {
-        globalArgs.reset();
       }
     }
   }
