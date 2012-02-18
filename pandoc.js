@@ -54,8 +54,9 @@ exports.convert = function(type, input, types, callback) {
     if(callback) {
       throw 'Invalid callback provided: must be a function.';
     }
-
-    console.log('Warning: no callback function passed to pandoc.convert().');
+    else {
+      throw 'No callback provided: must be a function.';
+    }
   }
 
   //what we're going to send to the callback if there are no pandoc errors
@@ -93,17 +94,13 @@ exports.convert = function(type, input, types, callback) {
       });
 
       pandoc.on('exit', function(code, signal) {
-        console.log('pandoc just exited with code ' + code + ' and signal ' + signal);
-
         numResponses++;
 
-        if(typeof callback === 'function') {
-          if(code !== 0) {
-            callback(null, code);
-          }
-          else if(numResponses === targetResponses) {
-            callback(res);
-          }
+        if(code !== 0) {
+          callback(null, code);
+        }
+        else if(numResponses === targetResponses) {
+          callback(res);
         }
       });
 
