@@ -71,11 +71,11 @@ exports.convert = function(type, input, types, callback) {
   //what we're going to send to the callback if there are no pandoc errors
   res[type] = input;
 
-  targetResponses = types.length;
-
   if(typeof types === 'string') {
     types = [ types ];
   }
+
+  targetResponses = types.length;
 
   for(i in types) {
     if(types.hasOwnProperty(i)) {
