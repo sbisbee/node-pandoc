@@ -6,7 +6,9 @@
  * (latest stable) we have to use spawn instead of fork().
  */
 
-var spawn = require('child_process').spawn;
+var childProcess = require('child_process');
+var spawn = childProcess.spawn;
+var exec = childProcess.exec;
 
 // The global command line args for pandocs.
 var globalArgs = {
@@ -77,51 +79,66 @@ exports.convert = function(type, input, types, callback) {
     types = [ types ];
   }
 
-  for(i in types) {
-    if(types.hasOwnProperty(i)) {
-      if(typeof types[i] !== 'string') {
-        throw 'Invalid destination type provided: non-string value found in array.';
-      }
+  exec('which pandoc', function(err, stdout) {
+    var pandocPath;
 
-      /*
-       * This if-block filters out the target markup type because we already set
-       * it on the res object.
-       */
-      if(!res[types[i]]) {
-        args = globalArgs.provided || [];
-        args.push('-f', type, '-t', types[i]);
+    if(err) {
+      throw err;
+    }
 
-        pandoc = spawn('pandoc', args);
+    if(!stdout) {
+      throw new Error('Cannot find pandoc - is it installed?');
+    }
 
-        //so that we have the target type in scope on('data') - love ya some asynch
-        pandoc.stdout.targetType = types[i];
+    //strip the newline
+    pandocPath = stdout.substr(0, stdout.length - 1);
 
-        pandoc.stdout.on('data', function(data) {
-          //data will be a binary stream if you don't cast it to a string
-          res[this.targetType] = data + '';
-        });
+    for(i in types) {
+      if(types.hasOwnProperty(i)) {
+        if(typeof types[i] !== 'string') {
+          throw 'Invalid destination type provided: non-string value found in array.';
+        }
 
-        pandoc.on('exit', function(code, signal) {
-          numResponses++;
+        /*
+         * This if-block filters out the target markup type because we already set
+         * it on the res object.
+         */
+        if(!res[types[i]]) {
+          args = globalArgs.provided || [];
+          args.push('-f', type, '-t', types[i]);
 
-          if(code !== 0) {
-            callback(null, code);
+          pandoc = spawn(pandocPath, args);
+
+          //so that we have the target type in scope on('data') - love ya some asynch
+          pandoc.stdout.targetType = types[i];
+
+          pandoc.stdout.on('data', function(data) {
+            //data will be a binary stream if you don't cast it to a string
+            res[this.targetType] = data + '';
+          });
+
+          pandoc.on('exit', function(code, signal) {
+            numResponses++;
+
+            if(code !== 0) {
+              callback(null, code);
+            }
+            else if(numResponses === targetResponses) {
+              callback(res);
+            }
+          });
+
+          //pipe them the input
+          pandoc.stdin.write(input, 'utf8');
+          pandoc.stdin.end();
+
+          if(!globalArgs.persist) {
+            globalArgs.reset();
           }
-          else if(numResponses === targetResponses) {
-            callback(res);
-          }
-        });
-
-        //pipe them the input
-        pandoc.stdin.write(input, 'utf8');
-        pandoc.stdin.end();
-
-        if(!globalArgs.persist) {
-          globalArgs.reset();
         }
       }
     }
-  }
+  });
 };
 
 /*
