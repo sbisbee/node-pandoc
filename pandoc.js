@@ -71,11 +71,11 @@ exports.convert = function(type, input, types, callback) {
   //what we're going to send to the callback if there are no pandoc errors
   res[type] = input;
 
-  targetResponses = types.length;
-
   if(typeof types === 'string') {
     types = [ types ];
   }
+
+  targetResponses = types.length;
 
   for(i in types) {
     if(types.hasOwnProperty(i)) {
@@ -101,7 +101,13 @@ exports.convert = function(type, input, types, callback) {
           res[this.targetType] = data + '';
         });
 
-        pandoc.on('exit', function(code, signal) {
+        // catch errors
+        pandoc.on('error', function(err) {
+          callback(null, err);
+        });
+
+        // wait for close, so that I/O is flushed before returning the results
+        pandoc.on('close', function(code, signal) {
           numResponses++;
 
           if(code !== 0) {
