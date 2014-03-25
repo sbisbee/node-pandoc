@@ -73,11 +73,11 @@ exports.convert = function(type, input, types, callback) {
   //what we're going to send to the callback if there are no pandoc errors
   res[type] = input;
 
-  targetResponses = types.length;
-
   if(typeof types === 'string') {
     types = [ types ];
   }
+
+  targetResponses = types.length;
 
   exec('which pandoc', function(err, stdout) {
     var pandocPath;
@@ -115,6 +115,10 @@ exports.convert = function(type, input, types, callback) {
           pandoc.stdout.on('data', function(data) {
             //data will be a binary stream if you don't cast it to a string
             res[this.targetType] = data + '';
+          });
+
+          pandoc.on('error', function(err) {
+            callback(null, err);
           });
 
           pandoc.on('exit', function(code, signal) {
